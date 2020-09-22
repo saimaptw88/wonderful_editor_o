@@ -5,7 +5,8 @@ services:
    image: postgres
    restart: always
    ports:
-     - 5433:5433
+      #  port host側の変更
+     - 5432:5432
    environment:
      POSTGRES_USER: root
      POSTGRES_PASSWORD: root
