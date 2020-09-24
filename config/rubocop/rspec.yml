@@ -48,7 +48,7 @@ RSpec/InstanceVariable:
 # 読みやすいテストになりやすいので、そこはレビューで担保していく必要がある。
 RSpec/MultipleExpectations:
   # エラーのため true -> false に変更：Warning: RSpec/MultipleExpectations does not support AggregateFailuresByDefault parameter.
-  AggregateFailuresByDefault: false
+  AggregateFailuresByDefault: true
 
 # 変に名前つけて呼ぶ方が分かりづらい。
 # テスト対象メソッドを呼ぶだけの subject 以外を書かないようにする方が効く。
