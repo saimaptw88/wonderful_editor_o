@@ -131,7 +131,9 @@ Metrics/CyclomaticComplexity:
 # * 警告 120文字
 # * 禁止 160文字
 # のイメージ
-Metrics/LineLength:
+Layout/LineLength:
+  # エラーにより変更：config/rubocop/rubocop.yml: Metrics/LineLength has the wrong namespace - should be Layout
+  # Metrics/LineLength:
   Max: 160
   Exclude:
     - "db/migrate/*.rb"
