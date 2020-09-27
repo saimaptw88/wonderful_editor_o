@@ -13,7 +13,6 @@
 #  encrypted_password     :string           default(""), not null
 #  image                  :string
 #  name                   :string
-#  nickname               :string
 #  provider               :string           default("email"), not null
 #  remember_created_at    :datetime
 #  reset_password_sent_at :datetime
@@ -38,4 +37,7 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
   include DeviseTokenAuth::Concerns::User
+
+  has_many :articles, dependent: :destroy
+  validates :name, presence: true
 end
