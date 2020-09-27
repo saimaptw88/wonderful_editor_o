@@ -19,7 +19,7 @@
 #
 FactoryBot.define do
   factory :article do
-    body { "MyText" }
-    title { "MyString" }
+    body { Faker::Quote.famous_last_words }
+    title { Faker::Job.title }
   end
 end

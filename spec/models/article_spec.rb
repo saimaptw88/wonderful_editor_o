@@ -17,8 +17,26 @@
 #
 #  fk_rails_...  (user_id => users.id)
 #
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe Article, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  # title
+  context "if title is entered" do
+    it "article can make" do
+      user = FactoryBot.create(:user)
+      # article = FactoryBot.create(:article, users_with_groups)
+      article = user.articles.new(title: Faker::Quote.famous_last_words, body: Faker::Job.title)
+      expect(article).to be_valid
+    end
+  end
+
+  context "if title is not entered" do
+    it "article can not make" do
+      user = User.create!(name: "fff", email: "fff@sample.com", password: "123456")
+      article = user.articles.new(body: "bbb")
+      expect(article).to be_invalid
+      # expect(article.errors.details[:title][0][:error]).to eq :blank
+      # expect(article.errors.messages[:title][0]).to eq "can't be blank"
+    end
+  end
 end
