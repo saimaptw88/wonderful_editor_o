@@ -19,7 +19,7 @@
 #
 FactoryBot.define do
   factory :article do
-    body { Faker::Quote.famous_last_words }
-    title { Faker::Job.title }
+    sequence(:body) {|n| "#{n}_#{Faker::Quote.famous_last_words}" }
+    sequence(:title) {|n| "#{n}_#{Faker::Job.title}" }
   end
 end
