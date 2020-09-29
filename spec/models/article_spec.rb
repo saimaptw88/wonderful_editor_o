@@ -40,8 +40,3 @@ RSpec.describe Article, type: :model do
     end
   end
 end
-
-RSpec.describe "Api::V1::Articles", type: :request do
-  it "記事一覧が取得できる" do
-  end
-end
