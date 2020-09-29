@@ -21,8 +21,8 @@ require "rails_helper"
 
 RSpec.describe Article, type: :model do
   # title
-  context "if title is entered" do
-    it "article can make" do
+  context "タイトルが入力されている時" do
+    it "記事が作成される" do
       user = FactoryBot.create(:user)
       # article = FactoryBot.create(:article, users_with_groups)
       article = user.articles.new(title: Faker::Quote.famous_last_words, body: Faker::Job.title)
@@ -30,13 +30,18 @@ RSpec.describe Article, type: :model do
     end
   end
 
-  context "if title is not entered" do
-    it "article can not make" do
-      user = User.create!(name: "fff", email: "fff@sample.com", password: "123456")
+  context "タイトルが入力されていない時" do
+    it "記事は作成されない" do
+      user = FactoryBot.create(:user)
       article = user.articles.new(body: "bbb")
       expect(article).to be_invalid
       # expect(article.errors.details[:title][0][:error]).to eq :blank
       # expect(article.errors.messages[:title][0]).to eq "can't be blank"
     end
+  end
+end
+
+RSpec.describe "Api::V1::Articles", type: :request do
+  it "記事一覧が取得できる" do
   end
 end
