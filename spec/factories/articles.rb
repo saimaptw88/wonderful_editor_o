@@ -21,5 +21,6 @@ FactoryBot.define do
   factory :article do
     sequence(:body) {|n| "#{n}_#{Faker::Quote.famous_last_words}" }
     sequence(:title) {|n| "#{n}_#{Faker::Job.title}" }
+    user
   end
 end
