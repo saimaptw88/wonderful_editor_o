@@ -33,7 +33,7 @@ RSpec.describe Article, type: :model do
   context "タイトルが入力されていない時" do
     it "記事は作成されない" do
       user = FactoryBot.create(:user)
-      article = user.articles.new(body:"fff")
+      article = user.articles.new(body: "fff")
       # article = FactoryBot.build(:article, title:"", user_id: user.id)
       expect(article).to be_invalid
       # expect(article.errors.details[:title][0][:error]).to eq :blank
