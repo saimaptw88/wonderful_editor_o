@@ -24,8 +24,8 @@ RSpec.describe Article, type: :model do
   context "タイトルが入力されている時" do
     it "記事が作成される" do
       user = FactoryBot.create(:user)
-      # article = FactoryBot.create(:article, users_with_groups)
-      article = user.articles.new(title: Faker::Quote.famous_last_words, body: Faker::Job.title)
+      # article = user.articles.new(title: Faker::Quote.famous_last_words, body: Faker::Job.title)
+      article = FactoryBot.create(:article, user_id: user.id)
       expect(article).to be_valid
     end
   end
@@ -33,7 +33,8 @@ RSpec.describe Article, type: :model do
   context "タイトルが入力されていない時" do
     it "記事は作成されない" do
       user = FactoryBot.create(:user)
-      article = user.articles.new(body: "bbb")
+      article = user.articles.new(body:"fff")
+      # article = FactoryBot.build(:article, title:"", user_id: user.id)
       expect(article).to be_invalid
       # expect(article.errors.details[:title][0][:error]).to eq :blank
       # expect(article.errors.messages[:title][0]).to eq "can't be blank"
