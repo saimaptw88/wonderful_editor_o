@@ -137,6 +137,17 @@ RSpec.describe "Api::V1::Articles", type: :request do
     end
   end
 
-  # describe "DELETE /api/v1/articles/:id" do
-  # end
+  # destroy
+  describe "DELETE /api/v1/articles/:id" do
+    subject { delete(api_v1_article_path(article_id)) }
+
+    let(:article_id) { article.id }
+    let(:article) { create(:article) }
+
+    it "正しい記事を取得し、記事が削除される" do
+      subject
+      expect(response.body).to eq ""
+      # expect{ subject }.to change{ User.count }.by(0)
+    end
+  end
 end
