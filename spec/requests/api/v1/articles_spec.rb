@@ -96,8 +96,46 @@ RSpec.describe "Api::V1::Articles", type: :request do
     end
   end
 
-  # describe "PATCH(PUT) /api/v1/articles/:id" do
-  # end
+  # upadate
+  describe "PATCH(PUT) /api/v1/articles/:id" do
+    subject { patch(api_v1_article_path(article_id), params: params) }
+
+    let(:article_id) { article.id }
+    let(:article) { create(:article) }
+    let(:params) do
+      {
+        article: {
+          body: Faker::Quote.famous_last_words.to_s,
+          id: Faker::Number.number(digits: 10),
+        },
+      }
+    end
+
+    context "送信した値のみ更新" do
+      it "更新成功" do
+        subject
+        res = JSON.parse(response.body)
+        expect(res[0]["body"]).to eq params[:article][:body]
+        # expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context "送信していない値は未更新" do
+      it "titleは変わらない" do
+        subject
+        res = JSON.parse(response.body)
+        expect(res[0]["title"]).to eq article.title
+      end
+    end
+
+    context "送信した値のうち、書き換えを許可していないものはそのまま" do
+      it "idは変化なし" do
+        subject
+        res = JSON.parse(response.body)
+        expect(res[0]["id"]).to eq article[:id]
+      end
+    end
+  end
 
   # describe "DELETE /api/v1/articles/:id" do
   # end
