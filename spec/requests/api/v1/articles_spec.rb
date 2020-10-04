@@ -58,28 +58,30 @@ RSpec.describe "Api::V1::Articles", type: :request do
     end
   end
 
-  # createメソッドをテストする
-  # describe "POST /api/v1/articles" do
-  #   article = user.Article.new(title:"fff", body:"fff")
-  #   subject{ post(api_v1_articles_path, params: params) }
+  # create
+  describe "POST /api/v1/articles" do
+    subject { post(api_v1_articles_path, params: params) }
 
-  #   context "適切なパラメータを送信する" do
-  #     # let(:params) { { article: FactoryBot.attributes_for(:article) } }
-  #     let(:user){ create(:user) }
+    context "適切なパラメータを送信する" do
+      let(:params) { { article: FactoryBot.attributes_for(:article) } }
+      let(:current_user) { create(:user) }
 
-  #     it "記事が作成される" do
-  #       expect{ subject }.to change{ Article.count }.by(1)
-  #     end
-  #   end
+      before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
 
-  #   context "適切出ないパラメータを送信する" do
-  #     let(:article)do
-  #       { article: FactoryBot.create(body:"aaa") }
-  #     end
-  #     it "エラーする" do
-  #     end
-  #   end
-  # end
+      it "記事が作成される" do
+        expect { subject }.to change { Article.count }.by(1)
+        # res = JSON.parse(response.body)
+        # expect(res["body"]).to eq params[:article][:body]
+        # expect(res["title"]).to eq params[:article][:title]
+        # expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context "適切出ないパラメータを送信する" do
+      it "エラーする" do
+      end
+    end
+  end
 
   # describe "PATCH(PUT) /api/v1/articles/:id" do
   # end
