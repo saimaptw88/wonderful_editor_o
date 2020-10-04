@@ -78,7 +78,20 @@ RSpec.describe "Api::V1::Articles", type: :request do
     end
 
     context "適切出ないパラメータを送信する" do
+      # titleが指定されていない場合
+      let(:params) do
+        {
+          article: {
+            body: Faker::Quote.famous_last_words.to_s,
+            # title: "#{n}_#{Faker::Job.title}"
+          },
+        }
+      end
+      let(:current_user) { create(:user) }
+      before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
+
       it "エラーする" do
+        expect { subject }.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
   end

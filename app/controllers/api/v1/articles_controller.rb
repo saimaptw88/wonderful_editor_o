@@ -19,8 +19,8 @@ module Api
       end
 
       def update
-        @article.update!(article_params)
-        render json: @article
+        article = current_user.articles.update!(article_params)
+        render json: article
       end
 
       def destroy
