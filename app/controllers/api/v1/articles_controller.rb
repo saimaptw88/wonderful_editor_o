@@ -19,7 +19,7 @@ module Api
       end
 
       def update
-        article = current_user.articles.update!(article_params)
+        article = current_user.articles.update(article_params)
         render json: article
       end
 
