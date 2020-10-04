@@ -14,9 +14,8 @@ module Api
       end
 
       def create
-        @article = Article.new(article_params)
-        @article.save!
-        render json: @article
+        article = current_user.articles.create!(article_params)
+        render json: article
       end
 
       def update
