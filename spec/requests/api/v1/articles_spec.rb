@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Articles", type: :request do
+  # index
   describe "GET /api/v1/articles" do
     subject { get(api_v1_articles_path) }
 
@@ -32,6 +33,7 @@ RSpec.describe "Api::V1::Articles", type: :request do
     end
   end
 
+  # show
   describe "GET /api/v1/articles/:id" do
     subject { get(api_v1_article_path(article_id)) }
 
@@ -56,7 +58,27 @@ RSpec.describe "Api::V1::Articles", type: :request do
     end
   end
 
+  # createメソッドをテストする
   # describe "POST /api/v1/articles" do
+  #   article = user.Article.new(title:"fff", body:"fff")
+  #   subject{ post(api_v1_articles_path, params: params) }
+
+  #   context "適切なパラメータを送信する" do
+  #     # let(:params) { { article: FactoryBot.attributes_for(:article) } }
+  #     let(:user){ create(:user) }
+
+  #     it "記事が作成される" do
+  #       expect{ subject }.to change{ Article.count }.by(1)
+  #     end
+  #   end
+
+  #   context "適切出ないパラメータを送信する" do
+  #     let(:article)do
+  #       { article: FactoryBot.create(body:"aaa") }
+  #     end
+  #     it "エラーする" do
+  #     end
+  #   end
   # end
 
   # describe "PATCH(PUT) /api/v1/articles/:id" do
