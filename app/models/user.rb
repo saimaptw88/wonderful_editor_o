@@ -39,5 +39,5 @@ class User < ApplicationRecord
   include DeviseTokenAuth::Concerns::User
 
   has_many :articles, dependent: :destroy
-  # validates :name, presence: true
+  validates :name, presence: true
 end
