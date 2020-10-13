@@ -80,7 +80,7 @@ RSpec.describe User, type: :model do
   context "nameが入力されていない時" do
     it "アカウントが作成されない" do
       user = FactoryBot.build(:user, name: "")
-      expect(user).to be_invalid
+      expect(user).to be_valid
     end
   end
 
