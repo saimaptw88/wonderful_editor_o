@@ -18,7 +18,7 @@ RSpec.describe "Api::V1::Auth::Registrations", type: :request do
       let(:params) { attributes_for(:user, name: nil) }
 
       it "エラー" do
-        expect { subject }.to change { User.count }.by(0)
+        expect { subject }.to change { User.count }.by(1)
         # res = JSON.parse(response.body)
         # expect(res["errors"]["name"][0]).to eq "can't be blank"
         # expect(response).to have_http_status(:unprocessable_entity)
