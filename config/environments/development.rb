@@ -60,10 +60,8 @@ Rails.application.configure do
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
-
   # devise_token_auth メール認証用の初期設定
-  config.action_mailer.default_url_options = { host: 'your-dev-host.dev' }
+  config.action_mailer.default_url_options = { host: "your-dev-host.dev" }
   config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = { address: 'your-dev-host.dev', port: 1025 }
-
+  config.action_mailer.smtp_settings = { address: "your-dev-host.dev", port: 1025 }
 end

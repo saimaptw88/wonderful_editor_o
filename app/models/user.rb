@@ -35,8 +35,8 @@ class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
-        #  :recoverable, :rememberable, :trackable, :validatable
-        # NoMethodError (undefined method `current_sign_in_at' for #<User:XXXXXXXXXXXXXX>)解決のため
+         #  :recoverable, :rememberable, :trackable, :validatable
+         # NoMethodError (undefined method `current_sign_in_at' for #<User:XXXXXXXXXXXXXX>)解決のため
          :recoverable, :rememberable, :validatable
   include DeviseTokenAuth::Concerns::User
 
