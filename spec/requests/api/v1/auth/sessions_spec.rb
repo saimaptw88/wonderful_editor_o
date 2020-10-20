@@ -27,21 +27,6 @@ RSpec.describe "Api::V1::Auth::Sessions", type: :request do
         subject
         expect(response).to have_http_status :ok
       end
-
-      it "passwordを満たし、ログインする" do
-        subject
-        expect(response.has_header?("uid")).to eq(true)
-      end
-
-      it "passwordを満たし、ログインする" do
-        subject
-        expect(response.has_header?("token-type")).to eq(true)
-      end
-
-      it "passwordを満たし、ログインする" do
-        subject
-        expect(response.has_header?("access-token")).to eq(true)
-      end
     end
 
     # emailが入力されていない

@@ -22,15 +22,15 @@ module Api
       end
 
       def update
-        binding.pry
-        @article = current_api_v1_user.articles.update(article_params)
+        article = current_api_v1_user.articles.find(params[:id])
+        article.update!(article_params)
         # 記事更新時に article.id が nil なのが問題
-        render json: @article
-        binding.pry
+        render json: article
       end
 
       def destroy
-        @article.destroy
+        article = current_api_v1_user.articles.find(params[:id])
+        article.destroy!
       end
 
       private

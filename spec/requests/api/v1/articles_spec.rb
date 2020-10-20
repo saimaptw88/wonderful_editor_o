@@ -1,49 +1,63 @@
+# article_controllerのメソッド操作時はユーザー認証が必要
+# 問題はどのタイミングでユーザー認証を行うか？
+# 候補1：articles_controllerのhttpリクエスト時
+# 　-> articles_controllerのメソッド実行時のリクエストに認証情報を送信
+# 候補2：articles_controllerのheetリクエスト前に別途ログイン
+# 　候補1で問題なく作動したため、実験していない
+
 require "rails_helper"
 
 RSpec.describe "Api::V1::Articles", type: :request do
-  # index
+  # index ( 修正済 )
   describe "GET /api/v1/articles" do
-    subject { get(api_v1_articles_path) }
+    # 候補1テスト中
+    subject { get(api_v1_articles_path, headers: headers) }
 
-    before do
-      user = FactoryBot.create(:user)
-      # インスタンスを作成
-      FactoryBot.create_list(:article, 3, user_id: user.id, updated_at: 1.days.ago)
-      # FactoryBot.create(:article, user_id: user.id)
-      # FactoryBot.create(:article, user_id: user.id, updated_at: 1.days.ago)
-      # FactoryBot.create(:article, user_id: user.id, updated_at: 2.days.ago)
-    end
+    # テスト用の記事作成
+    let!(:article1) { create(:article, updated_at: 2.days.ago) }
+    let!(:article2) { create(:article, updated_at: 1.days.ago) }
+    let!(:article3) { create(:article) }
 
-    # let!(:article1) { create(:article, updated_at: 2.days.ago) }
-    # let!(:article2) { create(:article, updated_at: 1.days.ago) }
-    # let!(:article3) { create(:article) }
+    # ログインに必要な情報
+    let(:user) { create(:user) }
+    let(:headers) { user.create_new_auth_token }
 
     # インスタンスが正しく作成され、表示されているかをテスト
-    it "記事一覧を取得できる" do
+    it "記事一覧を取得できるて、レスポンスが正常" do
       subject
-      # res = JSON.parse(response.body)
       # URLレポンスが正常？
       expect(response).to have_http_status(:ok)
-      # # インスタンスが3つ？
-      # expect(res.length).to eq 3
-      # # 更新順序に並び替えられている？
-      # expect(res.map {|d| d["id"] }).to eq [article3.id, article2.id, article1.id]
-      # # 取得keyの確認
-      # expect(res[0].keys).to eq ["id", "title", "updated_at", "user"]
+    end
+
+    it "インスタンスが3つ作成されているか" do
+      subject
+      res = JSON.parse(response.body)
+      # インスタンスが3つ？
+      expect(res.length).to eq 3
+    end
+
+    it "更新順に並び替えられているか" do
+      subject
+      res = JSON.parse(response.body)
+      # 更新順序に並び替えられている？
+      expect(res.map {|d| d["id"] }).to eq [article3.id, article2.id, article1.id]
+    end
+
+    it "keyを取得できているか" do
+      subject
+      res = JSON.parse(response.body)
+      # 取得keyの確認
+      expect(res[0].keys).to eq ["id", "title", "updated_at", "user"]
     end
   end
 
-  # show
+  # show ( 修正済 )
   describe "GET /api/v1/articles/:id" do
-    subject { get(api_v1_article_path(article_id)) }
+    subject { get(api_v1_article_path(article_id), headers: headers) }
 
-    context "指定したidのユーザーが存在しない場合" do
-      let(:article_id) { 10_000_000 }
-
-      it "ユーザーが見つからない" do
-        expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
-      end
-    end
+    # 認証情報の作成
+    let(:headers) { user.create_new_auth_token }
+    let(:user) { create(:user) }
 
     context "指定したidのユーザーが存在する場合" do
       let(:article_id) { article.id }
@@ -56,24 +70,51 @@ RSpec.describe "Api::V1::Articles", type: :request do
         # expect(response).to have_http_status(:ok)
       end
     end
+
+    context "指定したidのユーザーが存在しない場合" do
+      let(:article_id) { 10_000_000 }
+
+      it "ユーザーが見つからない" do
+        expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
   end
 
-  # create
+  # create ( 修正済 )
   describe "POST /api/v1/articles" do
-    subject { post(api_v1_articles_path, params: params) }
+    # リクエスト
+    subject { post(api_v1_articles_path, params: params, headers: headers) }
+
+    # 認証情報作成
+    let(:headers) { user.create_new_auth_token }
+    let(:user) { create(:user) }
 
     context "適切なパラメータを送信する" do
+      # 記事作成に必要な情報
       let(:params) { { article: FactoryBot.attributes_for(:article) } }
-      let(:current_user) { create(:user) }
 
-      before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
+      # 未実装な部分を補う
+      # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
 
-      it "記事が作成される" do
+      it "記事が作成され、データベースに記事が保存される" do
         expect { subject }.to change { Article.count }.by(1)
-        # res = JSON.parse(response.body)
-        # expect(res["body"]).to eq params[:article][:body]
-        # expect(res["title"]).to eq params[:article][:title]
-        # expect(response).to have_http_status(:ok)
+      end
+
+      it "記事が作成され、正常なbodyが登録される" do
+        subject
+        res = JSON.parse(response.body)
+        expect(res["body"]).to eq params[:article][:body]
+      end
+
+      it "記事が作成され、正常なtitleが登録される" do
+        subject
+        res = JSON.parse(response.body)
+        expect(res["title"]).to eq params[:article][:title]
+      end
+
+      it "記事が作成され、正常なhttpレスポンスが返ってくる" do
+        subject
+        expect(response).to have_http_status(:ok)
       end
     end
 
@@ -87,8 +128,10 @@ RSpec.describe "Api::V1::Articles", type: :request do
           },
         }
       end
-      let(:current_user) { create(:user) }
-      before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
+
+      # 未実装部分を補完
+      # let(:current_user) { create(:user) }
+      # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
 
       it "エラーする" do
         expect { subject }.to raise_error(ActiveRecord::RecordInvalid)
@@ -96,27 +139,50 @@ RSpec.describe "Api::V1::Articles", type: :request do
     end
   end
 
-  # upadate
+  # upadate ( 修正済 )
   describe "PATCH(PUT) /api/v1/articles/:id" do
-    subject { patch(api_v1_article_path(article_id), params: params) }
+    # リクエスト
+    subject { patch(api_v1_article_path(article_id), params: params, headers: headers) }
 
-    let(:article_id) { article.id }
-    let(:article) { create(:article) }
-    let(:params) do
-      {
-        article: {
-          body: Faker::Quote.famous_last_words.to_s,
-          id: Faker::Number.number(digits: 10),
-        },
-      }
+    # 事前にユーザーとユーザーに紐づく記事を作成
+    before do
+      @user = create(:user)
+      create(:article, user_id: user.id)
     end
+    # 直近で追加されたユーザーを見つけるメソッドが必要
+
+    # article_id作成
+    # let(:article_id) { Article.first.id }
+    let(:article_id) { article.id }
+    let(:article) { @user.articles.first }
+
+    # パラメータの作成
+    # let(:params) do
+    #   {
+    #     article: {
+    #       body: Faker::Quote.famous_last_words.to_s,
+    #       id: Faker::Number.number(digits: 10),
+    #       title: nil,
+    #     },
+    #   }
+    # end
+    let(:params) { { article: attributes_for(:article) } }
+
+    # 認証情報作成
+    let(:headers) { user.create_new_auth_token }
+    let(:user) { @user }
+    # let(:user) { User.first }
 
     context "送信した値のみ更新" do
+      it "レスポンスが正常" do
+        subject
+        expect(response).to have_http_status(:ok)
+      end
+
       it "更新成功" do
         subject
         res = JSON.parse(response.body)
-        expect(res[0]["body"]).to eq params[:article][:body]
-        # expect(response).to have_http_status(:ok)
+        expect(res["body"]).to eq params[:article][:body]
       end
     end
 
@@ -124,7 +190,7 @@ RSpec.describe "Api::V1::Articles", type: :request do
       it "titleは変わらない" do
         subject
         res = JSON.parse(response.body)
-        expect(res[0]["title"]).to eq article.title
+        expect(res["title"]).to eq params[:article][:title]
       end
     end
 
@@ -132,22 +198,33 @@ RSpec.describe "Api::V1::Articles", type: :request do
       it "idは変化なし" do
         subject
         res = JSON.parse(response.body)
-        expect(res[0]["id"]).to eq article[:id]
+        expect(res["id"]).to eq article.id
       end
     end
   end
 
-  # destroy
+  # destroy ( 修正済 )
   describe "DELETE /api/v1/articles/:id" do
-    subject { delete(api_v1_article_path(article_id)) }
+    subject { delete(api_v1_article_path(article_id), headers: headers) }
 
+    # 事前オブジェクト作成
+    before do
+      @user = create(:user)
+      create(:article, user_id: @user.id)
+    end
+
+    # パラメータの設定
     let(:article_id) { article.id }
-    let(:article) { create(:article) }
+    let(:article) { @user.articles.first }
+
+    # 認証情報の設定
+    let(:headers) { user.create_new_auth_token }
+    let(:user) { @user }
 
     it "正しい記事を取得し、記事が削除される" do
       subject
       expect(response.body).to eq ""
-      # expect{ subject }.to change{ User.count }.by(0)
+      # expect{ subject }.to change{ Article.count }.by(0)
     end
   end
 end
