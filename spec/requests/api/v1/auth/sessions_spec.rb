@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Auth::Sessions", type: :request do
-  # ログイン
+  # ログインテスト実装
   describe "POST /api/v1/auth/sessions#creatte" do
     subject { post(api_v1_user_session_path, params: params) }
 
@@ -64,7 +64,7 @@ RSpec.describe "Api::V1::Auth::Sessions", type: :request do
     end
   end
 
-  # ログアウト
+  # ログアウトテスト実装
   describe "DELETE /api/v1/auth/sessions#destroy" do
     # ログイン
     subject { delete(destroy_api_v1_user_session_path, headers: headers) }

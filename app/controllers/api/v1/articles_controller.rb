@@ -3,6 +3,9 @@ module Api
     class ArticlesController < Api::V1::BaseApiController
       respond_to :json
       before_action :set_article, only: [:show, :update, :destroy]
+      # Userがサインインしていなければ401エラーを返す
+      before_action :authenticate_api_v1_user!
+      # ↑追加したらテストでエラーが出る様になった
 
       def index
         @articles = Article.order(updated_at: :desc)
@@ -14,13 +17,16 @@ module Api
       end
 
       def create
-        article = current_user.articles.create!(article_params)
+        article = current_api_v1_user.articles.create!(article_params)
         render json: article
       end
 
       def update
-        article = current_user.articles.update(article_params)
-        render json: article
+        binding.pry
+        @article = current_api_v1_user.articles.update(article_params)
+        # 記事更新時に article.id が nil なのが問題
+        render json: @article
+        binding.pry
       end
 
       def destroy
