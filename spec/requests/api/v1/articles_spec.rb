@@ -51,6 +51,40 @@ RSpec.describe "Api::V1::Articles", type: :request do
     end
   end
 
+  # # openの一覧取得
+  # describe "GET /api/v1/articles/open" do
+  #   subject{ get(open_api_v1_articles_path, headers: headers) }
+  #   # subject{ get(open_api_v1_articles_path) }
+
+  #   # オブジェクト記事作成
+  #   before { 3.times { create(:article) } }
+
+  #   # ログイン認証用ユーザー作成
+  #   # before { @user = create(:user) }
+
+  #   # 認証情報の作成
+  #   # let(:headers){ @user.create_new_auth_token }
+  #   let(:user) { create(:user) }
+  #   let(:headers) { user.create_new_auth_token }
+
+  #   fit "レスポンスが正常" do
+  #     binding.pry
+  #     subject
+  #     expect(response).to have_http_status :ok
+  #   end
+
+  #   it "オブジェクトが正常数作成されている" do
+  #   end
+
+  #   it "作成されたオブジェクトが降順に変更されている" do
+  #   end
+  # end
+
+  # # draftの一覧取得
+  # describe "GET /api/v1/articles/draft" do
+
+  # end
+
   # show ( 修正済 )
   describe "GET /api/v1/articles/:id" do
     subject { get(api_v1_article_path(article_id), headers: headers) }
