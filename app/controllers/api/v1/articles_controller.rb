@@ -12,6 +12,18 @@ module Api
         render json: @articles, each_serializer: Api::V1::ArticlePreviewSerializer
       end
 
+      # # 追加。公開中の記事一覧表示
+      # def open
+      #   article = Article.open(update_at: :desc)
+      #   render json: article
+      # end
+
+      # # 追加。下書き中の記事一覧表示
+      # def draft
+      #   article = Article.draft(update_at: :desc)
+      #   render json: article
+      # end
+
       def show
         render json: @article
       end
