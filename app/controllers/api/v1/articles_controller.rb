@@ -8,8 +8,8 @@ module Api
       # ↑追加したらテストでエラーが出る様になった
 
       def index
-        @articles = Article.order(updated_at: :desc)
-        render json: @articles, each_serializer: Api::V1::ArticlePreviewSerializer
+        articles = Article.open(updated_at: :desc)
+        render json: articles, each_serializer: Api::V1::ArticlePreviewSerializer
       end
 
       # # 追加。公開中の記事一覧表示
@@ -36,7 +36,6 @@ module Api
       def update
         article = current_api_v1_user.articles.find(params[:id])
         article.update!(article_params)
-        # 記事更新時に article.id が nil なのが問題
         render json: article
       end
 
@@ -48,7 +47,7 @@ module Api
       private
 
         def article_params
-          params.require(:article).permit(:title, :body)
+          params.require(:article).permit(:title, :body, :status)
         end
 
         def set_article
