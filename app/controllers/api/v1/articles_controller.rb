@@ -8,8 +8,9 @@ module Api
       # ↑追加したらテストでエラーが出る様になった
 
       def index
-        articles = Article.open(updated_at: :desc)
-        render json: articles, each_serializer: Api::V1::ArticlePreviewSerializer
+        articles = Article.order(updated_at: :desc)
+        open_articles = articles.open
+        render json: open_articles, each_serializer: Api::V1::ArticlePreviewSerializer
       end
 
       # # 追加。公開中の記事一覧表示
