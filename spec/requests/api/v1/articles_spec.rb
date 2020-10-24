@@ -1,10 +1,3 @@
-# article_controllerのメソッド操作時はユーザー認証が必要
-# 問題はどのタイミングでユーザー認証を行うか？
-# 候補1：articles_controllerのhttpリクエスト時
-# 　-> articles_controllerのメソッド実行時のリクエストに認証情報を送信
-# 候補2：articles_controllerのheetリクエスト前に別途ログイン
-# 　候補1で問題なく作動したため、実験していない
-
 require "rails_helper"
 
 RSpec.describe "Api::V1::Articles", type: :request do
@@ -12,11 +5,14 @@ RSpec.describe "Api::V1::Articles", type: :request do
   describe "GET /api/v1/articles" do
     # 候補1テスト中
     subject { get(api_v1_articles_path, headers: headers) }
+    # subject { get(api_v1_articles_path) }
 
     # テスト用の記事作成
-    let!(:article1) { create(:article, updated_at: 2.days.ago) }
-    let!(:article2) { create(:article, updated_at: 1.days.ago) }
-    let!(:article3) { create(:article) }
+    before do
+      create(:article, updated_at: 2.days.ago)
+      create(:article, updated_at: 1.days.ago)
+      create(:article, status: :open)
+    end
 
     # ログインに必要な情報
     let(:user) { create(:user) }
@@ -25,29 +21,29 @@ RSpec.describe "Api::V1::Articles", type: :request do
     # インスタンスが正しく作成され、表示されているかをテスト
     it "記事一覧を取得できるて、レスポンスが正常" do
       subject
-      # URLレポンスが正常？
       expect(response).to have_http_status(:ok)
     end
 
-    it "インスタンスが3つ作成されているか" do
+    it "公開されている記事のみ取得している" do
       subject
       res = JSON.parse(response.body)
-      # インスタンスが3つ？
-      expect(res.length).to eq 3
+      articles = Article.open
+      expect(res.map {|i| i["status"] }).to eq articles.map(&:status)
     end
 
     it "更新順に並び替えられているか" do
       subject
       res = JSON.parse(response.body)
-      # 更新順序に並び替えられている？
-      expect(res.map {|d| d["id"] }).to eq [article3.id, article2.id, article1.id]
+      articles = Article.open
+      articles = articles.order(updated_at: :desc)
+
+      expect(res.map {|j| j["id"] }).to eq articles.map(&:id)
     end
 
     it "keyを取得できているか" do
       subject
       res = JSON.parse(response.body)
-      # 取得keyの確認
-      expect(res[0].keys).to eq ["id", "title", "updated_at", "user"]
+      expect(res[0].keys).to eq ["id", "title", "status", "updated_at", "user"]
     end
   end
 
@@ -82,7 +78,6 @@ RSpec.describe "Api::V1::Articles", type: :request do
 
   # # draftの一覧取得
   # describe "GET /api/v1/articles/draft" do
-
   # end
 
   # show ( 修正済 )
@@ -146,6 +141,12 @@ RSpec.describe "Api::V1::Articles", type: :request do
         expect(res["title"]).to eq params[:article][:title]
       end
 
+      it "記事が作成され、正常なstatusが登録される" do
+        subject
+        res = JSON.parse(response.body)
+        expect(res["status"]).to eq params[:article][:status]
+      end
+
       it "記事が作成され、正常なhttpレスポンスが返ってくる" do
         subject
         expect(response).to have_http_status(:ok)
@@ -159,6 +160,7 @@ RSpec.describe "Api::V1::Articles", type: :request do
           article: {
             body: Faker::Quote.famous_last_words.to_s,
             # title: "#{n}_#{Faker::Job.title}"
+            status: nil,
           },
         }
       end
@@ -181,31 +183,19 @@ RSpec.describe "Api::V1::Articles", type: :request do
     # 事前にユーザーとユーザーに紐づく記事を作成
     before do
       @user = create(:user)
-      create(:article, user_id: user.id)
+      create(:article, user_id: @user.id)
     end
-    # 直近で追加されたユーザーを見つけるメソッドが必要
 
     # article_id作成
-    # let(:article_id) { Article.first.id }
     let(:article_id) { article.id }
     let(:article) { @user.articles.first }
 
     # パラメータの作成
-    # let(:params) do
-    #   {
-    #     article: {
-    #       body: Faker::Quote.famous_last_words.to_s,
-    #       id: Faker::Number.number(digits: 10),
-    #       title: nil,
-    #     },
-    #   }
-    # end
     let(:params) { { article: attributes_for(:article) } }
 
     # 認証情報作成
     let(:headers) { user.create_new_auth_token }
     let(:user) { @user }
-    # let(:user) { User.first }
 
     context "送信した値のみ更新" do
       it "レスポンスが正常" do
@@ -217,6 +207,12 @@ RSpec.describe "Api::V1::Articles", type: :request do
         subject
         res = JSON.parse(response.body)
         expect(res["body"]).to eq params[:article][:body]
+      end
+
+      it "status情報が更新されている" do
+        subject
+        res = JSON.parse(response.body)
+        expect(res["status"]).to eq params[:article][:status]
       end
     end
 

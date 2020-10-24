@@ -22,6 +22,11 @@ FactoryBot.define do
   factory :article do
     sequence(:body) {|n| "#{n}_#{Faker::Quote.famous_last_words}" }
     sequence(:title) {|n| "#{n}_#{Faker::Job.title}" }
+
+    # statusのランダム入力
+    array_status = ["open", "draft"]
+    status { array_status.sample }
+
     user
   end
 end
