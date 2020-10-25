@@ -9,16 +9,17 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
+      # draftのルーティング( articlesのルーティングの前に設定しないとエラーする )
+      namespace :articles do
+        resources :draft, only: [:index, :show]
+      end
+
       mount_devise_token_auth_for "User", at: "auth", controllers: {
         registrations: "api/v1/auth/registrations",
       }
+
+      # articlesのルーティング
       resources :articles
-      # do
-      #   collection do
-      #     get 'open'
-      #     get 'draft'
-      #   end
-      # end
     end
   end
 end
