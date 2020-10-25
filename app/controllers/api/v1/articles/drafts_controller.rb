@@ -1,4 +1,4 @@
-class Api::V1::Articles::DraftController < ApplicationController
+class Api::V1::Articles::DraftsController < ApplicationController
   # Userがサインインしていなければ401エラーを返す
   before_action :authenticate_api_v1_user!
 
