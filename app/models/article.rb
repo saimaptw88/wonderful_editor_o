@@ -22,7 +22,7 @@ class Article < ApplicationRecord
   # 【変更点】task11.1 enumについて
   enum status: {
     draft: 0,
-    open: 1,
+    published: 1,
   }
 
   belongs_to :user

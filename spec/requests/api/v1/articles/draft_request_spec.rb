@@ -2,8 +2,8 @@ require "rails_helper"
 
 RSpec.describe "Api::V1::Articles::Drafts", type: :request do
   # index
-  describe "GET /index" do
-    subject { get(api_v1_articles_draft_index_path, headers: headers) }
+  describe "GET /api/v1/articles/drafts" do
+    subject { get(api_v1_articles_drafts_path, headers: headers) }
 
     # 記事作成
     before do

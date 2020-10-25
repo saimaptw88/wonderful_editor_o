@@ -8,8 +8,8 @@ module Api
       # ↑追加したらテストでエラーが出る様になった
 
       def index
-        articles = Article.order(updated_at: :desc)
-        open_articles = articles.open
+        articles = current_api_v1_user.articles.order(updated_at: :desc)
+        open_articles = articles.published
         render json: open_articles, each_serializer: Api::V1::ArticlePreviewSerializer
       end
 
@@ -35,14 +35,12 @@ module Api
       end
 
       def update
-        article = current_api_v1_user.articles.find(params[:id])
-        article.update!(article_params)
-        render json: article
+        @article.update!(article_params)
+        render json: @article
       end
 
       def destroy
-        article = current_api_v1_user.articles.find(params[:id])
-        article.destroy!
+        @article.destroy!
       end
 
       private
@@ -52,7 +50,7 @@ module Api
         end
 
         def set_article
-          @article = Article.find(params[:id])
+          @article = current_api_v1_user.articles.find(params[:id])
         end
     end
   end

@@ -24,7 +24,7 @@ FactoryBot.define do
     sequence(:title) {|n| "#{n}_#{Faker::Job.title}" }
 
     # statusのランダム入力
-    array_status = ["open", "draft"]
+    array_status = ["published", "draft"]
     status { array_status.sample }
 
     user

@@ -9,14 +9,15 @@ RSpec.describe "Api::V1::Articles", type: :request do
 
     # テスト用の記事作成
     before do
-      create(:article, updated_at: 2.days.ago)
-      create(:article, updated_at: 1.days.ago)
-      create(:article, status: :open)
+      @user = create(:user)
+      create(:article, user_id: @user.id, updated_at: 2.days.ago)
+      create(:article, user_id: @user.id, updated_at: 1.days.ago)
+      create(:article, user_id: @user.id, status: :published)
+      create_list(:article, 4)
     end
 
     # ログインに必要な情報
-    let(:user) { create(:user) }
-    let(:headers) { user.create_new_auth_token }
+    let(:headers) { @user.create_new_auth_token }
 
     # インスタンスが正しく作成され、表示されているかをテスト
     it "記事一覧を取得できるて、レスポンスが正常" do
@@ -27,17 +28,13 @@ RSpec.describe "Api::V1::Articles", type: :request do
     it "公開されている記事のみ取得している" do
       subject
       res = JSON.parse(response.body)
-      articles = Article.open
-      expect(res.map {|i| i["status"] }).to eq articles.map(&:status)
+      expect(res.map {|i| i["status"] }).to eq @user.articles.published.map(&:status)
     end
 
     it "更新順に並び替えられているか" do
       subject
       res = JSON.parse(response.body)
-      articles = Article.open
-      articles = articles.order(updated_at: :desc)
-
-      expect(res.map {|j| j["id"] }).to eq articles.map(&:id)
+      expect(res.map {|j| j["id"] }).to eq @user.articles.published.order(updated_at: :desc).map(&:id)
     end
 
     it "keyを取得できているか" do
@@ -47,50 +44,18 @@ RSpec.describe "Api::V1::Articles", type: :request do
     end
   end
 
-  # # openの一覧取得
-  # describe "GET /api/v1/articles/open" do
-  #   subject{ get(open_api_v1_articles_path, headers: headers) }
-  #   # subject{ get(open_api_v1_articles_path) }
-
-  #   # オブジェクト記事作成
-  #   before { 3.times { create(:article) } }
-
-  #   # ログイン認証用ユーザー作成
-  #   # before { @user = create(:user) }
-
-  #   # 認証情報の作成
-  #   # let(:headers){ @user.create_new_auth_token }
-  #   let(:user) { create(:user) }
-  #   let(:headers) { user.create_new_auth_token }
-
-  #   fit "レスポンスが正常" do
-  #     binding.pry
-  #     subject
-  #     expect(response).to have_http_status :ok
-  #   end
-
-  #   it "オブジェクトが正常数作成されている" do
-  #   end
-
-  #   it "作成されたオブジェクトが降順に変更されている" do
-  #   end
-  # end
-
-  # # draftの一覧取得
-  # describe "GET /api/v1/articles/draft" do
-  # end
-
   # show ( 修正済 )
   describe "GET /api/v1/articles/:id" do
     subject { get(api_v1_article_path(article_id), headers: headers) }
 
+    before { @user = create(:user) }
     # 認証情報の作成
-    let(:headers) { user.create_new_auth_token }
-    let(:user) { create(:user) }
+
+    let(:headers) { @user.create_new_auth_token }
 
     context "指定したidのユーザーが存在する場合" do
       let(:article_id) { article.id }
-      let(:article) { create(:article) }
+      let(:article) { create(:article, user_id: @user.id) }
 
       it "記事を返す" do
         subject
@@ -114,13 +79,14 @@ RSpec.describe "Api::V1::Articles", type: :request do
     # リクエスト
     subject { post(api_v1_articles_path, params: params, headers: headers) }
 
+    before { @user = create(:user) }
     # 認証情報作成
-    let(:headers) { user.create_new_auth_token }
-    let(:user) { create(:user) }
+
+    let(:headers) { @user.create_new_auth_token }
 
     context "適切なパラメータを送信する" do
       # 記事作成に必要な情報
-      let(:params) { { article: FactoryBot.attributes_for(:article) } }
+      let(:params) { { article: FactoryBot.attributes_for(:article, user_id: @user.id) } }
 
       # 未実装な部分を補う
       # before { allow_any_instance_of(Api::V1::BaseApiController).to receive(:current_user).and_return(current_user) }
@@ -194,8 +160,7 @@ RSpec.describe "Api::V1::Articles", type: :request do
     let(:params) { { article: attributes_for(:article) } }
 
     # 認証情報作成
-    let(:headers) { user.create_new_auth_token }
-    let(:user) { @user }
+    let(:headers) { @user.create_new_auth_token }
 
     context "送信した値のみ更新" do
       it "レスポンスが正常" do
@@ -248,8 +213,7 @@ RSpec.describe "Api::V1::Articles", type: :request do
     let(:article) { @user.articles.first }
 
     # 認証情報の設定
-    let(:headers) { user.create_new_auth_token }
-    let(:user) { @user }
+    let(:headers) { @user.create_new_auth_token }
 
     it "正しい記事を取得し、記事が削除される" do
       subject

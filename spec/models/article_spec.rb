@@ -43,14 +43,14 @@ RSpec.describe Article, type: :model do
   end
 
   context "status: が入力されている" do
-    it "status: :openの時記事が作成される" do
-      article = create(:article, status: :open)
+    it "status: :publishedの時記事が作成される" do
+      article = create(:article, status: :published)
       expect(article).to be_valid
     end
 
-    it "status: :openの入力で記事作成に成功し、作成された記事がstatus: :openである" do
-      article = create(:article, status: :open)
-      expect(article.status).to eq "open"
+    it "status: :publishedの入力で記事作成に成功し、作成された記事がstatus: :publishedである" do
+      article = create(:article, status: :published)
+      expect(article.status).to eq "published"
     end
 
     it "status: :draftの時記事が作成される" do
