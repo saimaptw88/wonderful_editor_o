@@ -9,6 +9,11 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
+      # current_articles
+      namespace :current do
+        resources :articles, only: [:index]
+      end
+
       # draftのルーティング( articlesのルーティングの前に設定しないとエラーする )
       namespace :articles do
         resources :draft, only: [:index, :show]
