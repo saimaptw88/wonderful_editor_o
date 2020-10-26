@@ -28,13 +28,13 @@ RSpec.describe "Api::V1::Articles", type: :request do
     it "公開されている記事のみ取得している" do
       subject
       res = JSON.parse(response.body)
-      expect(res.map {|i| i["status"] }).to eq @user.articles.published.map(&:status)
+      expect(res.map {|i| i["status"] }).to eq Article.published.map(&:status)
     end
 
     it "更新順に並び替えられているか" do
       subject
       res = JSON.parse(response.body)
-      expect(res.map {|j| j["id"] }).to eq @user.articles.published.order(updated_at: :desc).map(&:id)
+      expect(res.map {|j| j["id"] }).to eq Article.published.order(updated_at: :desc).map(&:id)
     end
 
     it "keyを取得できているか" do
@@ -98,7 +98,7 @@ RSpec.describe "Api::V1::Articles", type: :request do
       it "記事が作成され、正常なbodyが登録される" do
         subject
         res = JSON.parse(response.body)
-        expect(res["body"]).to eq params[:article][:body]
+        expect(Article.find(res["id"]).body).to eq params[:article][:body]
       end
 
       it "記事が作成され、正常なtitleが登録される" do
@@ -171,7 +171,7 @@ RSpec.describe "Api::V1::Articles", type: :request do
       it "更新成功" do
         subject
         res = JSON.parse(response.body)
-        expect(res["body"]).to eq params[:article][:body]
+        expect(Article.find(res["id"]).body).to eq params[:article][:body]
       end
 
       it "status情報が更新されている" do

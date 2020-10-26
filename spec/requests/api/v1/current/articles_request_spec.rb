@@ -30,7 +30,7 @@ RSpec.describe "Api::V1::Current::Articles", type: :request do
     it "user_idがログインしているユーザーのものである" do
       subject
       res = JSON.parse(response.body)
-      expect(res.map {|i| i["user_id"] }).to eq @user.articles.published.map {|j| j[:user_id] }
+      expect(res[0]["user"]["id"]).to eq @user.id
     end
 
     it "取得した記事が更新順で返ってくる" do

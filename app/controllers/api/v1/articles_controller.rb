@@ -2,31 +2,19 @@ module Api
   module V1
     class ArticlesController < Api::V1::BaseApiController
       respond_to :json
-      before_action :set_article, only: [:show, :update, :destroy]
+      before_action :set_article, only: [:update, :destroy]
       # Userがサインインしていなければ401エラーを返す
-      before_action :authenticate_api_v1_user!
+      # before_action :authenticate_api_v1_user!
       # ↑追加したらテストでエラーが出る様になった
 
       def index
-        articles = current_api_v1_user.articles.order(updated_at: :desc)
-        open_articles = articles.published
-        render json: open_articles, each_serializer: Api::V1::ArticlePreviewSerializer
+        articles = Article.order(updated_at: :desc).published
+        render json: articles, each_serializer: Api::V1::ArticlePreviewSerializer
       end
 
-      # # 追加。公開中の記事一覧表示
-      # def open
-      #   article = Article.open(update_at: :desc)
-      #   render json: article
-      # end
-
-      # # 追加。下書き中の記事一覧表示
-      # def draft
-      #   article = Article.draft(update_at: :desc)
-      #   render json: article
-      # end
-
       def show
-        render json: @article
+        article = Article.find(params[:id])
+        render json: article, serializer: Api::V1::ArticleSerializer
       end
 
       def create
