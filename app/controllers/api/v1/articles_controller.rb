@@ -14,7 +14,7 @@ module Api
 
       def show
         article = Article.find(params[:id])
-        render json: article, serializer: Api::V1::ArticleSerializer
+        render json: article, serializer: Api::V1::ArticlePreviewSerializer
       end
 
       def create
