@@ -44,7 +44,8 @@ RSpec.describe "Api::V1::Articles::Drafts", type: :request do
     # 記事一覧の中からdraftかつ、article.idが若いものを送信
     let(:article_id) { @user.articles.draft.first.id }
 
-    it "認証に成功し、正常なレスポンスが返ってくる" do
+    fit "認証に成功し、正常なレスポンスが返ってくる" do
+      binding.pry
       subject
       expect(response).to have_http_status(:success)
     end
