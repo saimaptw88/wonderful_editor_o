@@ -20,7 +20,7 @@ ActiveRecord::Schema.define(version: 2020_10_22_102632) do
     t.string "title"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.bigint "user_id", null: false
+    t.bigint "user_id"
     t.integer "status"
     t.index ["user_id"], name: "index_articles_on_user_id"
   end
