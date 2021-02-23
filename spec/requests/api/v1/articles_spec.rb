@@ -18,6 +18,7 @@ RSpec.describe "Api::V1::Articles", type: :request do
 
     # ログインに必要な情報
     let(:headers) { @user.create_new_auth_token }
+    let(:res) { JSON.parse(response.body) }
 
     # インスタンスが正しく作成され、表示されているかをテスト
     it "記事一覧を取得できるて、レスポンスが正常" do
@@ -27,20 +28,17 @@ RSpec.describe "Api::V1::Articles", type: :request do
 
     it "公開されている記事のみ取得している" do
       subject
-      res = JSON.parse(response.body)
       expect(res.map {|i| i["status"] }).to eq Article.published.map(&:status)
     end
 
     it "更新順に並び替えられているか" do
       subject
-      res = JSON.parse(response.body)
       expect(res.map {|j| j["id"] }).to eq Article.published.order(updated_at: :desc).map(&:id)
     end
 
     it "keyを取得できているか" do
       subject
-      res = JSON.parse(response.body)
-      expect(res[0].keys).to eq ["id", "title", "status", "updated_at", "user"]
+      expect(res[0].keys).to eq ["id", "title", "status", "updated_at", "body", "user"]
     end
   end
 
